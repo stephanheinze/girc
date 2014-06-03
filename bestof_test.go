@@ -37,3 +37,15 @@ func TestBestOfRandom(t *testing.T) {
 		t.Errorf("Invalid bestof response. %q", response)
 	}
 }
+
+func TestBestOfFiltered(t *testing.T) {
+	bestof := BEST_OF("")
+	bestof.Add("entry one")
+	bestof.Add("entry two")
+	bestof.Add("entry three")
+	bestof.Add("entry four")
+	_, response := bestof.process("tester!tester@tester.irc.server.org PRIVMSG #bla :!bestof thr")
+	if response != "BestOf[1/1]: entry three" {
+		t.Errorf("Invalid filtered bestof response. %q", response)
+	}
+}

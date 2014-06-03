@@ -1,10 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
 	"regexp"
 	"sync"
@@ -15,7 +13,7 @@ type BestOf struct {
 	processPattern *regexp.Regexp
 	filename       string
 	store          bool
-	entries        []string
+	entries        StringList
 	mutex          *sync.Mutex
 }
 
@@ -30,15 +28,13 @@ func BEST_OF(filename string) *BestOf {
 		bestOf.store = false
 	} else {
 		if file, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE, 0666); err != nil {
-			log.Printf("Could not open bestof-file %q - reason: %s", filename)
+			log.Printf("Could not open bestof-file %q - reason: %s", filename, err.Error())
 			log.Printf("!!! BestOfs will *NOT BE STORED* !!!")
 			bestOf.store = false
 		} else {
 			defer file.Close()
 			bestOf.store = true
-			if err := json.NewDecoder(file).Decode(&bestOf.entries); err != nil {
-				log.Printf("Could not decode bestof-file %q - reason: %s", filename, err.Error())
-			}
+			bestOf.entries.Read(file)
 		}
 	}
 	return &bestOf
@@ -58,7 +54,15 @@ func (this *BestOf) process(line string) (channel string, response string) {
 	channel = match[1]
 	switch match[2] {
 	case "":
-		max, index, entry := this.Random()
+		var (
+			max, index int
+			entry      string
+		)
+		if match[3] != "" {
+			max, index, entry = this.entries.FilteredRandom(match[3])
+		} else {
+			max, index, entry = this.entries.Random()
+		}
 		response = fmt.Sprintf("BestOf[%d/%d]: %s", index, max, entry)
 	case "-add":
 		total := this.Add(match[3])
@@ -70,7 +74,7 @@ func (this *BestOf) process(line string) (channel string, response string) {
 	case "-del":
 		response = "not implemented yet."
 	case "-count":
-		response = fmt.Sprintf("I've got %d bestof entries.", len(this.entries))
+		response = fmt.Sprintf("I've got %d bestof entries.", this.entries.Len())
 	default:
 		response = "unknown subcommand %q - use bestoff|bestof-add|bestof-count."
 	}
@@ -78,33 +82,18 @@ func (this *BestOf) process(line string) (channel string, response string) {
 }
 
 func (this *BestOf) Add(entry string) int {
-	this.entries = append(this.entries, entry)
+	this.entries.Add(entry)
 	if this.store {
 		this.mutex.Lock()
 		defer this.mutex.Unlock()
 		if file, err := os.OpenFile(this.filename, os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0666); err == nil {
-			if err := json.NewEncoder(file).Encode(this.entries); err != nil {
-				log.Printf("Can't encode bestof entries - reason: %s", err.Error())
+			if err := this.entries.Write(file); err != nil {
+				log.Printf("Can't write bestof entries - reason: %s", err.Error())
 			}
 			file.Close()
 		} else {
 			log.Printf("Can't write bestof file - reason: %s", err.Error())
 		}
 	}
-	return len(this.entries)
-}
-
-func (this *BestOf) Random() (max int, index int, entry string) {
-	max = len(this.entries)
-	switch max {
-	case 0:
-		return 0, 0, "-- no entries yet --"
-	case 1:
-		return 1, 1, this.entries[0]
-	default:
-		index = rand.Intn(max)
-		entry = this.entries[index]
-		index = index + 1
-		return
-	}
+	return this.entries.Len()
 }
