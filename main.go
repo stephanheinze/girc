@@ -63,6 +63,7 @@ func main() {
 	portPtr := flag.Uint("p", uint(6667), "port")
 	channelPtr := flag.String("c", "", "channel to join at startup")
 	bestofPtr := flag.String("b", "/tmp/girc-bestof.json", "bestof-data-file")
+	matrixPtr := flag.String("m", "", "file with one liner cites from matrix (the film)")
 
 	flag.Parse()
 
@@ -87,6 +88,10 @@ func main() {
 	gossip.addCommand(CALC())
 	gossip.addCommand(KICK())
 	gossip.addCommand(BEST_OF(*bestofPtr))
+
+	if *matrixPtr != "" {
+		gossip.addCommand(CITE("matrix", *matrixPtr))
+	}
 
 	gossip.start()
 }
