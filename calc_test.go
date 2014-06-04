@@ -27,3 +27,13 @@ func TestCalcProcess(t *testing.T) {
 		t.Errorf("invalid result %q", result)
 	}
 }
+
+func TestCalculate(t *testing.T) {
+	calc := CALC()
+	if result, err := calc.calculate("(1+1)*(2+2)"); result != "8" {
+		t.Errorf("invalid result %s, %q", result, err)
+	}
+	if result, err := calc.calculate("1/0"); err.Error() != "division by zero" {
+		t.Errorf("division by zero not detected %s, %q", result, err)
+	}
+}
