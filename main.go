@@ -46,6 +46,9 @@ func (this *Gossip) start() {
 	this.Conn = c
 	c.Cmd("NICK %s\r\n", this.Nick)
 	c.Cmd("USER %s 8 * :%s", this.Nick, this.Nick)
+	if this.Channel != "" {
+		c.Cmd("JOIN %s\r\n", this.Channel)
+	}
 	for {
 		text, err := c.ReadLine()
 		if err != nil {
