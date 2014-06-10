@@ -93,6 +93,8 @@ func main() {
 	gossip.addCommand(KICK())
 	gossip.addCommand(BEST_OF(*bestofPtr))
 	gossip.addCommand(ME(gossip.Nick, *mePtr))
+	gossip.addCommand(INVITE())
+	gossip.addCommand(LEAVE())
 
 	if *matrixPtr != "" {
 		gossip.addCommand(CITE("matrix", *matrixPtr))
