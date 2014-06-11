@@ -22,6 +22,14 @@ func TestFilterNoResult(t *testing.T) {
 	cite := CITE("test", "examples/cites.txt")
 	_, response := cite.process(":tester!tester@test.irc.server.org PRIVMSG #bla :!test unknown")
 	if response != "test[0/0]: -- no entries --" {
-		t.Errorf("Invalid filtere response without result. %q", response)
+		t.Errorf("Invalid filtered response without result. %q", response)
+	}
+}
+
+func TestCiteIndex(t *testing.T) {
+	cite := CITE("test", "examples/cites.txt")
+	_, response := cite.process(":tester!tester@test.irc.server.org PRIVMSG #bla :!test #8")
+	if response != "test[8/8]: lorem ipsum" {
+		t.Errorf("Invalid indexed cite. %q", response)
 	}
 }
