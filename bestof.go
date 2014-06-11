@@ -10,6 +10,7 @@ import (
 
 type BestOf struct {
 	commandPattern *regexp.Regexp
+	indexPattern   *regexp.Regexp
 	processPattern *regexp.Regexp
 	filename       string
 	store          bool
@@ -20,6 +21,7 @@ type BestOf struct {
 func BEST_OF(filename string) *BestOf {
 	bestOf := BestOf{
 		commandPattern: regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :!bestof.*$"),
+		indexPattern:   regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :!bestof #([0-9]+)"),
 		processPattern: regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :!bestof([^ ]*)(.*)$"),
 		filename:       filename,
 		mutex:          &sync.Mutex{},
@@ -50,14 +52,26 @@ func (this *BestOf) Process(line string, gossip *Gossip) {
 }
 
 func (this *BestOf) process(line string) (channel string, response string) {
+	var (
+		max, index int
+		entry      string
+		err        error
+	)
+	indexMatch := this.indexPattern.FindStringSubmatch(line)
+	if indexMatch != nil {
+		channel = indexMatch[1]
+		max, index, entry, err = this.entries.Index(indexMatch[2])
+		if err != nil {
+			response = fmt.Sprintf("Bestof: %s", err.Error())
+		} else {
+			response = fmt.Sprintf("Bestof[%d/%d]: %s", index, max, entry)
+		}
+		return
+	}
 	match := this.processPattern.FindStringSubmatch(line)
 	channel = match[1]
 	switch match[2] {
 	case "":
-		var (
-			max, index int
-			entry      string
-		)
 		if match[3] != "" {
 			max, index, entry = this.entries.FilteredRandom(match[3])
 		} else {

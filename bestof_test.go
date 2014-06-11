@@ -27,11 +27,7 @@ func TestBestOfAdd(t *testing.T) {
 }
 
 func TestBestOfRandom(t *testing.T) {
-	bestof := BEST_OF("")
-	bestof.Add("entry 1")
-	bestof.Add("entry 2")
-	bestof.Add("entry 3")
-	bestof.Add("entry 4")
+	bestof := exampleBestOf()
 	_, response := bestof.process(":tester!tester@test.irc.server.org PRIVMSG #bla :!bestof  ")
 	if strings.HasPrefix("BestOf[", response) {
 		t.Errorf("Invalid bestof response. %q", response)
@@ -39,13 +35,42 @@ func TestBestOfRandom(t *testing.T) {
 }
 
 func TestBestOfFiltered(t *testing.T) {
+	bestof := exampleBestOf()
+	_, response := bestof.process("tester!tester@tester.irc.server.org PRIVMSG #bla :!bestof thr")
+	if response != "BestOf[1/1]: entry three" {
+		t.Errorf("Invalid filtered bestof response. %q", response)
+	}
+}
+
+func TestBestOfIndexed(t *testing.T) {
+	bestof := exampleBestOf()
+	_, response := bestof.process("tester!tester@tester.irc.server.org PRIVMSG #bla :!bestof #2")
+	if response != "Bestof[2/4]: entry two" {
+		t.Errorf("Invalid indexed bestof response. %q", response)
+	}
+}
+
+func TestBestOfIndexTooLarge(t *testing.T) {
+	bestof := exampleBestOf()
+	_, response := bestof.process("tester!tester@tester.irc.server.org PRIVMSG #bla :!bestof #5")
+	if response != "Bestof: invalid index #5" {
+		t.Errorf("Invalid bestof response for too large index. %q", response)
+	}
+}
+
+func TestBestOfIndexZero(t *testing.T) {
+	bestof := exampleBestOf()
+	_, response := bestof.process("tester!tester@tester.irc.server.org PRIVMSG #bla :!bestof #0")
+	if response != "Bestof: invalid index #0" {
+		t.Errorf("Invalid bestof response for too large index. %q", response)
+	}
+}
+
+func exampleBestOf() *BestOf {
 	bestof := BEST_OF("")
 	bestof.Add("entry one")
 	bestof.Add("entry two")
 	bestof.Add("entry three")
 	bestof.Add("entry four")
-	_, response := bestof.process("tester!tester@tester.irc.server.org PRIVMSG #bla :!bestof thr")
-	if response != "BestOf[1/1]: entry three" {
-		t.Errorf("Invalid filtered bestof response. %q", response)
-	}
+	return bestof
 }

@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"math/rand"
+	"strconv"
 	"strings"
 )
 
@@ -50,6 +52,24 @@ func (this *StringList) FilteredRandom(filter string) (max, index int, entry str
 		}
 	}
 	return this.random(reduced)
+}
+
+func (this *StringList) Index(indexString string) (max, index int, entry string, err error) {
+	var (
+		i int
+	)
+	max = len(this.entries)
+	i, err = strconv.Atoi(indexString)
+	if err != nil {
+		return
+	}
+	if i <= max && i > 0 {
+		index = i
+		entry = this.entries[i-1]
+		return
+	}
+	err = errors.New(fmt.Sprintf("invalid index #%d", i))
+	return
 }
 
 func (this *StringList) random(entries []string) (max, index int, entry string) {
