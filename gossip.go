@@ -33,6 +33,18 @@ func (this *Gossip) parseLine(line string) {
 	}
 }
 
+func (this *Gossip) SendMessage(channel, msg string) {
+	this.Conn.Cmd("PRIVMSG %s :%s\r\n", channel, msg)
+}
+
+func (this *Gossip) JoinChannel(channel string) {
+	this.Conn.Cmd("JOIN %s\r\n", channel)
+}
+
+func (this *Gossip) LeaveChannel(channel, reason string) {
+	this.Conn.Cmd("PART %s :%s\r\n", channel, reason)
+}
+
 func (this *Gossip) start() {
 	c, err := textproto.Dial("tcp", fmt.Sprintf("%s:%d", this.Server, this.Port))
 	if err != nil {

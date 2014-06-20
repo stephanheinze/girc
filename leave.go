@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"regexp"
 )
 
@@ -21,7 +22,7 @@ func (this *Leave) Match(line string) bool {
 
 func (this *Leave) Process(line string, gossip *Gossip) {
 	channel, name := this.parseLine(line)
-	gossip.Conn.Cmd("PART %s :reason: %s wants me to leave\r\n", channel, name)
+	gossip.LeaveChannel(channel, fmt.Sprintf("reason: %s wants me to leave", name))
 }
 
 func (this *Leave) parseLine(line string) (channel, name string) {

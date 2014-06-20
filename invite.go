@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"regexp"
 )
 
@@ -21,8 +22,8 @@ func (this *Invite) Match(line string) bool {
 
 func (this *Invite) Process(line string, gossip *Gossip) {
 	channel, name := this.parseLine(line)
-	gossip.Conn.Cmd("JOIN %s\r\n", channel)
-	gossip.Conn.Cmd("PRIVMSG %s :Thanks %s for invitation.\r\n", channel, name)
+	gossip.JoinChannel(channel)
+	gossip.SendMessage(channel, fmt.Sprintf("Thanks %s for invitation.", name))
 }
 
 func (this *Invite) parseLine(line string) (channel, name string) {
