@@ -41,7 +41,7 @@ func (this *Me) Match(line string) bool {
 
 func (this *Me) Process(line string, gossip *Gossip) {
 	channel, response := this.process(line)
-	gossip.Conn.Cmd("PRIVMSG %s :%s\r\n", channel, response)
+	gossip.SendMessage(channel, response)
 }
 
 func (this *Me) process(line string) (channel string, response string) {

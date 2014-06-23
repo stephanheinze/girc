@@ -48,7 +48,7 @@ func (this *BestOf) Match(line string) bool {
 
 func (this *BestOf) Process(line string, gossip *Gossip) {
 	channel, response := this.process(line)
-	gossip.Conn.Cmd("PRIVMSG %s :%s\r\n", channel, response)
+	gossip.SendMessage(channel, response)
 }
 
 func (this *BestOf) process(line string) (channel string, response string) {
