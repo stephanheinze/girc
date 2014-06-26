@@ -20,9 +20,9 @@ type BestOf struct {
 
 func BEST_OF(filename string) *BestOf {
 	bestOf := BestOf{
-		commandPattern: regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :!bestof.*$"),
-		indexPattern:   regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :!bestof #([0-9]+)"),
-		processPattern: regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :!bestof([^ ]*)(.*)$"),
+		commandPattern: regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :#bestof.*$"),
+		indexPattern:   regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :#bestof #([0-9]+)"),
+		processPattern: regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :#bestof([^ ]*)(.*)$"),
 		filename:       filename,
 		mutex:          &sync.Mutex{},
 	}
@@ -90,7 +90,7 @@ func (this *BestOf) process(line string) (channel string, response string) {
 	case "-count":
 		response = fmt.Sprintf("I've got %d bestof entries.", this.entries.Len())
 	default:
-		response = "unknown subcommand %q - use bestoff|bestof-add|bestof-count."
+		response = "unknown subcommand %q - use bestof|bestof-add|bestof-count."
 	}
 	return
 }

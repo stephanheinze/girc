@@ -11,7 +11,7 @@ type Leave struct {
 
 func LEAVE() *Leave {
 	leave := Leave{
-		pattern: regexp.MustCompile("^:(.*)+\\!+[^ ]+ PRIVMSG ([^ ]+) :!kick.*$"),
+		pattern: regexp.MustCompile("^:(.*)+\\!+[^ ]+ PRIVMSG ([^ ]+) :#kick.*$"),
 	}
 	return &leave
 }

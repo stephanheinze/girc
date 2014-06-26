@@ -11,7 +11,7 @@ type Calc struct {
 
 func CALC() *Calc {
 	return &Calc{
-		pattern: regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :!calc(.*)$"),
+		pattern: regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :#calc(.*)$"),
 	}
 }
 
