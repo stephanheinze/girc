@@ -9,9 +9,9 @@ type Leave struct {
 	pattern *regexp.Regexp
 }
 
-func LEAVE() *Leave {
+func LEAVE(p string) *Leave {
 	leave := Leave{
-		pattern: regexp.MustCompile("^:(.*)+\\!+[^ ]+ PRIVMSG ([^ ]+) :#kick.*$"),
+		pattern: regexp.MustCompile(fmt.Sprintf("^:(.*)+\\!+[^ ]+ PRIVMSG ([^ ]+) :%skick.*$", p)),
 	}
 	return &leave
 }
