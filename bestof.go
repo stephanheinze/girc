@@ -18,11 +18,11 @@ type BestOf struct {
 	mutex          *sync.Mutex
 }
 
-func BEST_OF(filename string) *BestOf {
+func BEST_OF(filename, p string) *BestOf {
 	bestOf := BestOf{
-		commandPattern: regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :#bestof.*$"),
-		indexPattern:   regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :#bestof #([0-9]+)"),
-		processPattern: regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :#bestof([^ ]*)(.*)$"),
+		commandPattern: regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%sbestof.*$", p)),
+		indexPattern:   regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%sbestof #([0-9]+)", p)),
+		processPattern: regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%sbestof([^ ]*)(.*)$", p)),
 		filename:       filename,
 		mutex:          &sync.Mutex{},
 	}

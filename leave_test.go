@@ -5,7 +5,7 @@ import (
 )
 
 func TestLeaveMatchLineLeave(t *testing.T) {
-	me := LEAVE()
+	me := LEAVE("#")
 	b := me.Match(":tester!tester@test.irc.server.org PRIVMSG #channel2 :#kick")
 	if b == false {
 		t.Error("Match wrong result.")
@@ -13,7 +13,7 @@ func TestLeaveMatchLineLeave(t *testing.T) {
 }
 
 func TestLeaveMatchLinePrivMsg(t *testing.T) {
-	me := LEAVE()
+	me := LEAVE("#")
 	b := me.Match(":tester!tester@test.irc.server.org PRIVMSG #bla :what's up guys")
 	if b == true {
 		t.Error("Match wrong result.")
@@ -21,7 +21,7 @@ func TestLeaveMatchLinePrivMsg(t *testing.T) {
 }
 
 func TestLeaveParseLine(t *testing.T) {
-	me := LEAVE()
+	me := LEAVE("#")
 	channel, name := me.parseLine(":tester!tester@test.irc.server.org PRIVMSG #channel2 :#kick")
 	if channel != "#channel2" {
 		t.Error("Wrong value for channel.")

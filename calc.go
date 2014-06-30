@@ -9,9 +9,9 @@ type Calc struct {
 	pattern *regexp.Regexp
 }
 
-func CALC() *Calc {
+func CALC(p string) *Calc {
 	return &Calc{
-		pattern: regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :#calc(.*)$"),
+		pattern: regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%scalc(.*)$", p)),
 	}
 }
 

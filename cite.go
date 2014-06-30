@@ -16,11 +16,11 @@ type Cite struct {
 	entries        StringList
 }
 
-func CITE(shortCut, filename string) *Cite {
+func CITE(shortCut, filename, p string) *Cite {
 	cite := Cite{
-		commandPattern: regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :#" + shortCut + ".*$"),
-		indexPattern:   regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :#" + shortCut + " #([0-9]+)"),
-		processPattern: regexp.MustCompile("^[^ ]+ PRIVMSG ([^ ]+) :#" + shortCut + " *([^ ]*)$"),
+		commandPattern: regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%s"+shortCut+".*$", p)),
+		indexPattern:   regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%s"+shortCut+" #([0-9]+)", p)),
+		processPattern: regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%s"+shortCut+" *([^ ]*)$", p)),
 		shortCut:       shortCut,
 	}
 	if file, err := os.Open(filename); err != nil {

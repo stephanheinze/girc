@@ -17,6 +17,7 @@ func main() {
 	bestofPtr := flag.String("b", "/tmp/girc-bestof.json", "bestof-data-file")
 	mePtr := flag.String("me", "", "me-data-file")
 	matrixPtr := flag.String("m", "", "file with one liner cites from matrix (the film)")
+	cmdPrefixPtr := flag.String("t", "!", "prefix to trigger bot commands")
 
 	flag.Parse()
 
@@ -38,15 +39,15 @@ func main() {
 	gossip.addCommand(JOIN())
 	gossip.addCommand(PING())
 
-	gossip.addCommand(CALC())
+	gossip.addCommand(CALC(*cmdPrefixPtr))
 	gossip.addCommand(KICK())
-	gossip.addCommand(BEST_OF(*bestofPtr))
+	gossip.addCommand(BEST_OF(*bestofPtr, *cmdPrefixPtr))
 	gossip.addCommand(ME(gossip.Nick, *mePtr))
 	gossip.addCommand(INVITE())
-	gossip.addCommand(LEAVE())
+	gossip.addCommand(LEAVE(*cmdPrefixPtr))
 
 	if *matrixPtr != "" {
-		gossip.addCommand(CITE("matrix", *matrixPtr))
+		gossip.addCommand(CITE("matrix", *matrixPtr, *cmdPrefixPtr))
 	}
 
 	gossip.start()

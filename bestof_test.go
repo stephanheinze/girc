@@ -6,7 +6,7 @@ import (
 )
 
 func TestBestOfCountEmpty(t *testing.T) {
-	bestof := BEST_OF("")
+	bestof := BEST_OF("", "#")
 	_, response := bestof.process(":tester!tester@test.irc.server.org PRIVMSG #bla :#bestof-count")
 	if response != "I've got 0 bestof entries." {
 		t.Errorf("Invalid count on empty bestof. %q", response)
@@ -15,7 +15,7 @@ func TestBestOfCountEmpty(t *testing.T) {
 
 func TestBestOfAdd(t *testing.T) {
 	var response string
-	bestof := BEST_OF("")
+	bestof := BEST_OF("", "#")
 	_, response = bestof.process(":tester!tester@test.irc.server.org PRIVMSG #bla :#bestof-add hello world")
 	if response != "Ok. Added. Got 1 bestof entry now." {
 		t.Errorf("Invalid response on first bestof-add. %q", response)
@@ -67,7 +67,7 @@ func TestBestOfIndexZero(t *testing.T) {
 }
 
 func exampleBestOf() *BestOf {
-	bestof := BEST_OF("")
+	bestof := BEST_OF("", "#")
 	bestof.Add("entry one")
 	bestof.Add("entry two")
 	bestof.Add("entry three")
