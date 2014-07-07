@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"regexp"
 	"time"
 )
 
@@ -36,18 +37,20 @@ func main() {
 		os.Exit(1)
 	}
 
+	prefix := regexp.QuoteMeta(*cmdPrefixPtr)
+
 	gossip.addCommand(JOIN())
 	gossip.addCommand(PING())
 
-	gossip.addCommand(CALC(*cmdPrefixPtr))
+	gossip.addCommand(CALC(prefix))
 	gossip.addCommand(KICK())
-	gossip.addCommand(BEST_OF(*bestofPtr, *cmdPrefixPtr))
+	gossip.addCommand(BEST_OF(*bestofPtr, prefix))
 	gossip.addCommand(ME(gossip.Nick, *mePtr))
 	gossip.addCommand(INVITE())
-	gossip.addCommand(LEAVE(*cmdPrefixPtr))
+	gossip.addCommand(LEAVE(prefix))
 
 	if *matrixPtr != "" {
-		gossip.addCommand(CITE("matrix", *matrixPtr, *cmdPrefixPtr))
+		gossip.addCommand(CITE("matrix", *matrixPtr, prefix))
 	}
 
 	gossip.start()
