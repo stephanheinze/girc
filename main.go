@@ -19,6 +19,7 @@ func main() {
 	mePtr := flag.String("me", "", "me-data-file")
 	matrixPtr := flag.String("m", "", "file with one liner cites from matrix (the film)")
 	cmdPrefixPtr := flag.String("t", "!", "prefix to trigger bot commands")
+	shutDownPassPtr := flag.String("x", "11111", "shutdown password")
 
 	flag.Parse()
 
@@ -48,6 +49,7 @@ func main() {
 	gossip.addCommand(ME(gossip.Nick, *mePtr))
 	gossip.addCommand(INVITE())
 	gossip.addCommand(LEAVE(prefix))
+	gossip.addCommand(SHUTDOWN(*shutDownPassPtr))
 
 	if *matrixPtr != "" {
 		gossip.addCommand(CITE("matrix", *matrixPtr, prefix))
