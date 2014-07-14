@@ -45,7 +45,7 @@ func main() {
 
 	gossip.addCommand(CALC(prefix))
 	gossip.addCommand(KICK())
-	gossip.addCommand(BEST_OF(*bestofPtr, prefix))
+	gossip.addCommand(EXT_LIST("bestof", *bestofPtr, prefix))
 	gossip.addCommand(ME(gossip.Nick, *mePtr))
 	gossip.addCommand(INVITE())
 	gossip.addCommand(LEAVE(prefix))
