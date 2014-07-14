@@ -8,21 +8,23 @@ import (
 	"sync"
 )
 
-type BestOf struct {
+type ExtList struct {
 	commandPattern *regexp.Regexp
 	indexPattern   *regexp.Regexp
 	processPattern *regexp.Regexp
+	shortcut       string
 	filename       string
 	store          bool
 	entries        StringList
 	mutex          *sync.Mutex
 }
 
-func BEST_OF(filename, p string) *BestOf {
-	bestOf := BestOf{
-		commandPattern: regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%sbestof.*$", p)),
-		indexPattern:   regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%sbestof #([0-9]+)", p)),
-		processPattern: regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%sbestof([^ ]*)(.*)$", p)),
+func EXT_LIST(shortcut, filename, p string) *ExtList {
+	bestOf := ExtList{
+		commandPattern: regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%s%s.*$", p, shortcut)),
+		indexPattern:   regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%s%s #([0-9]+)", p, shortcut)),
+		processPattern: regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%s%s([^ ]*)(.*)$", p, shortcut)),
+		shortcut:       shortcut,
 		filename:       filename,
 		mutex:          &sync.Mutex{},
 	}
@@ -30,8 +32,8 @@ func BEST_OF(filename, p string) *BestOf {
 		bestOf.store = false
 	} else {
 		if file, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE, 0666); err != nil {
-			log.Printf("Could not open bestof-file %q - reason: %s", filename, err.Error())
-			log.Printf("!!! BestOfs will *NOT BE STORED* !!!")
+			log.Printf("Could not open %s-file %q - reason: %s", bestOf.shortcut, filename, err.Error())
+			log.Printf("!!! New entries *WILL NOT BE STORED* !!!")
 			bestOf.store = false
 		} else {
 			defer file.Close()
@@ -42,16 +44,16 @@ func BEST_OF(filename, p string) *BestOf {
 	return &bestOf
 }
 
-func (this *BestOf) Match(line string) bool {
+func (this *ExtList) Match(line string) bool {
 	return this.commandPattern.MatchString(line)
 }
 
-func (this *BestOf) Process(line string, gossip *Gossip) {
+func (this *ExtList) Process(line string, gossip *Gossip) {
 	channel, response := this.process(line)
 	gossip.SendMessage(channel, response)
 }
 
-func (this *BestOf) process(line string) (channel string, response string) {
+func (this *ExtList) process(line string) (channel string, response string) {
 	var (
 		max, index int
 		entry      string
@@ -62,9 +64,9 @@ func (this *BestOf) process(line string) (channel string, response string) {
 		channel = indexMatch[1]
 		max, index, entry, err = this.entries.Index(indexMatch[2])
 		if err != nil {
-			response = fmt.Sprintf("Bestof: %s", err.Error())
+			response = fmt.Sprintf("%s: %s", this.shortcut, err.Error())
 		} else {
-			response = fmt.Sprintf("Bestof[%d/%d]: %s", index, max, entry)
+			response = fmt.Sprintf("%s[%d/%d]: %s", this.shortcut, index, max, entry)
 		}
 		return
 	}
@@ -77,36 +79,32 @@ func (this *BestOf) process(line string) (channel string, response string) {
 		} else {
 			max, index, entry = this.entries.Random()
 		}
-		response = fmt.Sprintf("BestOf[%d/%d]: %s", index, max, entry)
+		response = fmt.Sprintf("%s[%d/%d]: %s", this.shortcut, index, max, entry)
 	case "-add":
-		total := this.Add(match[3])
-		if total == 1 {
-			response = "Ok. Added. Got 1 bestof entry now."
-		} else {
-			response = fmt.Sprintf("Ok. Added. Got %d bestof entries now.", total)
-		}
+		this.Add(match[3])
+		response = "OK"
 	case "-del":
 		response = "not implemented yet."
 	case "-count":
-		response = fmt.Sprintf("I've got %d bestof entries.", this.entries.Len())
+		response = fmt.Sprintf("I've got %d %s entries.", this.entries.Len(), this.shortcut)
 	default:
-		response = "unknown subcommand %q - use bestof|bestof-add|bestof-count."
+		response = fmt.Sprintf("unknown subcommand - use %s|%s-add|%s-count.", this.shortcut, this.shortcut, this.shortcut)
 	}
 	return
 }
 
-func (this *BestOf) Add(entry string) int {
+func (this *ExtList) Add(entry string) int {
 	this.entries.Add(entry)
 	if this.store {
 		this.mutex.Lock()
 		defer this.mutex.Unlock()
 		if file, err := os.OpenFile(this.filename, os.O_TRUNC|os.O_RDWR|os.O_CREATE, 0666); err == nil {
 			if err := this.entries.Write(file); err != nil {
-				log.Printf("Can't write bestof entries - reason: %s", err.Error())
+				log.Printf("Can't write %s entries - reason: %s", this.shortcut, err.Error())
 			}
 			file.Close()
 		} else {
-			log.Printf("Can't write bestof file - reason: %s", err.Error())
+			log.Printf("Can't write %s file - reason: %s", this.shortcut, err.Error())
 		}
 	}
 	return this.entries.Len()
