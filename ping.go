@@ -7,7 +7,7 @@ type Ping struct {
 }
 
 func PING() *Ping {
-	return &Ping{pattern: regexp.MustCompile("^PING :([a-zA-Z0-9\\.]+)$")}
+	return &Ping{pattern: regexp.MustCompile("^PING :(.*)$")}
 }
 
 func (this *Ping) Match(line string) bool {
