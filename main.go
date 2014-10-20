@@ -44,7 +44,6 @@ func main() {
 	gossip.addCommand(JOIN())
 	gossip.addCommand(PING())
 
-	gossip.addCommand(CALC(prefix))
 	gossip.addCommand(KICK())
 	gossip.addCommand(EXT_LIST("bestof", *bestofPtr, prefix))
 	gossip.addCommand(EXT_LIST("nosmoke", *nosmokePtr, prefix))
