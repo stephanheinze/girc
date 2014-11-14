@@ -10,6 +10,10 @@ func TestInviteMatchLineInvite(t *testing.T) {
 	if b == false {
 		t.Error("Match wrong result.")
 	}
+	b = me.Match(":tester!tester@test.irc.server.org INVITE girc #channel2")
+	if b == false {
+		t.Error("Match wrong result.")
+	}
 }
 
 func TestInviteMatchLinePrivMsg(t *testing.T) {
