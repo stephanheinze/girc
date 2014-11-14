@@ -11,7 +11,7 @@ type Invite struct {
 
 func INVITE() *Invite {
 	invite := Invite{
-		pattern: regexp.MustCompile("^:(.*)+\\!+[^ ]+ INVITE [^ ]+ :(.*)$"),
+		pattern: regexp.MustCompile("^:(.*)+\\!+[^ ]+ INVITE [^ ]+ :?(.*)$"),
 	}
 	return &invite
 }
