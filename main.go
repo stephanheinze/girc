@@ -25,7 +25,9 @@ func main() {
 	flag.Parse()
 
 	gossip := new(Gossip)
-	gossip.Channel = *channelPtr
+	if *channelPtr != "" {
+		gossip.AddChannel(*channelPtr)
+	}
 	gossip.Port = *portPtr
 	switch flag.NArg() {
 	case 2:

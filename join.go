@@ -7,7 +7,7 @@ type Join struct {
 }
 
 func JOIN() *Join {
-	return &Join{pattern: regexp.MustCompile(":End of /MOTD command\\.$")}
+	return &Join{pattern: regexp.MustCompile(":End of \\/?MOTD command\\.*$")}
 }
 
 func (this *Join) Match(line string) bool {
@@ -15,5 +15,5 @@ func (this *Join) Match(line string) bool {
 }
 
 func (this *Join) Process(_ string, gossip *Gossip) {
-	gossip.Conn.Cmd("JOIN %s\r\n", gossip.Channel)
+	gossip.JoinChannels()
 }

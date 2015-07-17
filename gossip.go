@@ -1,6 +1,7 @@
 package main
 
 import (
+	"container/list"
 	"fmt"
 	"log"
 	"net/textproto"
@@ -14,7 +15,7 @@ type Command interface {
 type Gossip struct {
 	Server   string
 	Port     uint
-	Channel  string
+	Channels list.List
 	Nick     string
 	Conn     *textproto.Conn
 	Commands []Command
@@ -43,6 +44,35 @@ func (this *Gossip) JoinChannel(channel string) {
 
 func (this *Gossip) LeaveChannel(channel, reason string) {
 	this.Conn.Cmd("PART %s :%s\r\n", channel, reason)
+	this.RemoveChannel(channel)
+}
+
+func (this *Gossip) AddChannel(channel string) {
+	this.Channels.PushBack(channel)
+}
+
+func (this *Gossip) RemoveChannel(channel string) {
+	for e := this.Channels.Front(); e != nil; e = e.Next() {
+		if e.Value.(string) == channel {
+			this.Channels.Remove(e)
+			break
+		}
+	}
+}
+
+func (this *Gossip) PrintChannels() {
+	fmt.Printf("%s is member of the following channels: ", this.Nick)
+	for e := this.Channels.Front(); e != nil; e = e.Next() {
+		fmt.Print(e.Value.(string))
+		fmt.Print(" ")
+	}
+	fmt.Println()
+}
+
+func (this *Gossip) JoinChannels() {
+	for e := this.Channels.Front(); e != nil; e = e.Next() {
+		this.JoinChannel(e.Value.(string))
+	}
 }
 
 func (this *Gossip) start() {
@@ -52,11 +82,10 @@ func (this *Gossip) start() {
 		return
 	}
 	this.Conn = c
+
 	c.Cmd("NICK %s\r\n", this.Nick)
 	c.Cmd("USER %s 8 * :%s", this.Nick, this.Nick)
-	if this.Channel != "" {
-		c.Cmd("JOIN %s\r\n", this.Channel)
-	}
+
 	for {
 		text, err := c.ReadLine()
 		if err != nil {

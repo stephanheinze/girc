@@ -23,6 +23,7 @@ func (this *Leave) Match(line string) bool {
 func (this *Leave) Process(line string, gossip *Gossip) {
 	channel, name := this.parseLine(line)
 	gossip.LeaveChannel(channel, fmt.Sprintf("reason: %s wants me to leave", name))
+	gossip.PrintChannels()
 }
 
 func (this *Leave) parseLine(line string) (channel, name string) {
