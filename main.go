@@ -9,12 +9,29 @@ import (
 	"time"
 )
 
+type channelinit []string
+
+func (c *channelinit) Set(value string) error {
+	*c = append(*c, value)
+	return nil
+}
+
+func (c *channelinit) String() string {
+	var r string
+	for _, v := range *c {
+		r += "," + v
+	}
+	return r
+}
+
 func main() {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
+	var ic channelinit
+
 	portPtr := flag.Uint("p", uint(6667), "port")
-	channelPtr := flag.String("c", "", "channel to join at startup")
+	flag.Var(&ic, "c", "channel to join at startup")
 	bestofPtr := flag.String("b", "/tmp/girc-bestof.json", "bestof-data-file")
 	nosmokePtr := flag.String("nosmoke", "/tmp/girc-nosmoke.json", "nosmoke-data-file")
 	mePtr := flag.String("me", "", "me-data-file")
@@ -25,8 +42,10 @@ func main() {
 	flag.Parse()
 
 	gossip := new(Gossip)
-	if *channelPtr != "" {
-		gossip.AddChannel(*channelPtr)
+	for _, c := range ic {
+		if c != "" {
+			gossip.AddChannel(c)
+		}
 	}
 	gossip.Port = *portPtr
 	switch flag.NArg() {
