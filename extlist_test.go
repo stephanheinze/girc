@@ -14,15 +14,30 @@ func TestExtListCountEmpty(t *testing.T) {
 }
 
 func TestExtListAdd(t *testing.T) {
-	var response string
 	mylist := EXT_LIST("mylist", "", "#")
-	_, response = mylist.process(":tester!tester@test.irc.server.org PRIVMSG #bla :#mylist-add hello world")
+	_, response := mylist.process(":tester!tester@test.irc.server.org PRIVMSG #bla :#mylist-add hello world")
 	if response != "OK" {
 		t.Errorf("Invalid response on first mylist-add. %q", response)
 	}
 	_, response = mylist.process(":tester!tester@test.irc.server.org PRIVMSG #bla :#mylist-add hello outer world")
 	if response != "OK" {
 		t.Errorf("Invalid response on second mylist-add. %q", response)
+	}
+}
+
+func TestExtListAddNothing(t *testing.T) {
+	mylist := EXT_LIST("mylist", "", "#")
+	_, response := mylist.process(":tester!tester@test.irc.server.org PRIVMSG #bla :#mylist-add")
+	if response != "error: nothing to add" {
+		t.Errorf("Invalid response for empty mylist-add. %q", response)
+	}
+}
+
+func TestExtListAddSpace(t *testing.T) {
+	mylist := EXT_LIST("mylist", "", "#")
+	_, response := mylist.process(":tester!tester@test.irc.server.org PRIVMSG #bla :#mylist-add   ")
+	if response != "error: nothing to add" {
+		t.Errorf("Invalid response for empty mylist-add. %q", response)
 	}
 }
 
