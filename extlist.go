@@ -82,8 +82,9 @@ func (this *ExtList) process(line string) (channel string, response string) {
 		}
 		response = fmt.Sprintf("%s[%d/%d]: %s", this.shortcut, index, max, entry)
 	case "-add":
-		if len(strings.TrimSpace(match[3])) != 0 {
-			this.Add(match[3])
+		v := strings.TrimSpace(match[3])
+		if len(v) != 0 {
+			this.Add(v)
 			response = "OK"
 		} else {
 			response = "error: nothing to add"

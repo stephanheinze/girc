@@ -25,6 +25,18 @@ func TestExtListAdd(t *testing.T) {
 	}
 }
 
+func TestExtListAddWithSpace(t *testing.T) {
+	l := EXT_LIST("mylist", "", "#")
+	_, response := l.process(":tester!tester@test.irc.server.org PRIVMSG #bla :#mylist-add 	  with ws 	 ")
+	if response != "OK" {
+		t.Errorf("Invalid response %q", response)
+	}
+	_, response = l.process("tester!tester@tester.irc.server.org PRIVMSG #bla :#mylist with ws")
+	if response != "mylist[1/1]: with ws" {
+		t.Errorf("Entry not properly added: %q", response)
+	}
+}
+
 func TestExtListAddNothing(t *testing.T) {
 	mylist := EXT_LIST("mylist", "", "#")
 	_, response := mylist.process(":tester!tester@test.irc.server.org PRIVMSG #bla :#mylist-add")
