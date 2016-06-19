@@ -18,9 +18,9 @@ type Cite struct {
 
 func CITE(shortCut, filename, p string) *Cite {
 	cite := Cite{
-		commandPattern: regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%s"+shortCut+".*$", p)),
-		indexPattern:   regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%s"+shortCut+" #([0-9]+)", p)),
-		processPattern: regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%s"+shortCut+" *([^ ]*)$", p)),
+		commandPattern: regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%s%s.*$", p, shortCut)),
+		indexPattern:   regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%s%s #([0-9]+)", p, shortCut)),
+		processPattern: regexp.MustCompile(fmt.Sprintf("^[^ ]+ PRIVMSG ([^ ]+) :%s%s *([^ ]*)$", p, shortCut)),
 		shortCut:       shortCut,
 	}
 	if file, err := os.Open(filename); err != nil {
